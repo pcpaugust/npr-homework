@@ -1,0 +1,41 @@
+type Employee {
+  id: Int!
+  first_name: String!
+  last_name: String!
+  salary: Float!
+  gender: Gender!
+  description: String
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+input CreateEmployeeInput {
+  first_name: String!
+  last_name: String!
+  salary: Float! = 0
+  gender: Gender!
+  description: String
+}
+
+input UpdateEmployeeInput {
+  first_name: String
+  last_name: String
+  salary: Float
+  gender: Gender
+  description: String
+}
+
+type Query {
+  EmployeeFindAll: [Employee!]!
+  EmployeeFindOne(id: Int!): Employee
+}
+
+type Mutation {
+  EmployeeCreate(data: CreateEmployeeInput!): Employee!
+  EmployeeUpdate(id: Int!, data: UpdateEmployeeInput!): Employee!
+  EmployeeRemove(id: Int!): Employee!
+}
