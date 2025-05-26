@@ -1,0 +1,10 @@
+query EmployeeFindOne($id: Int!) {
+  EmployeeFindOne(id: $id) {
+    id
+    first_name
+    last_name
+    gender
+    salary
+    description
+  }
+}

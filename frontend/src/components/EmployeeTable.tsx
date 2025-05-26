@@ -8,25 +8,29 @@ import {
   DragDropContext, Droppable, Draggable
 } from '@hello-pangea/dnd';
 
-import { Employee, useEmployeeRemoveMutation } from "../generated/graphql";
+import { Employee, PaginationMetadata, useEmployeeRemoveMutation } from "../generated/graphql";
 import { GraphQLClient } from 'graphql-request';
+import { set } from 'react-hook-form';
 
 type Props = {
   data: Employee[];
+  meta: PaginationMetadata;
   onSuccess?: () => void;
   api: GraphQLClient;
+  onRowClick?: (id: number) => void;
+  paginated: (page: number, pageSize: number) => void;
 };
 
-function EmployeeTable({ data, onSuccess, api } : Props) {
+function EmployeeTable({ data, onSuccess, api, onRowClick, paginated, meta } : Props) {
     const mutation = useEmployeeRemoveMutation(api);
-    const [tableData, setData] = useState(data);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [page, setPage] = useState(meta.page - 1);
+    const [rowsPerPage, setRowsPerPage] = useState(meta.pageSize);
 
-    useEffect(() => {
-        setData(data || []);
-    }, [data]);
-
+    const handleClick = (event: React.MouseEvent<HTMLTableRowElement>, row: Employee) => {
+        if (onRowClick) {
+            onRowClick(row.id);
+        }
+    };
 
     const handleRemove = async (id: number) => {
         console.log("Removing employee with ID:", id);
@@ -38,22 +42,11 @@ function EmployeeTable({ data, onSuccess, api } : Props) {
             console.log(`Delete failed: ${err.message}`);
         },
         });
-    }
-
-    const handleChangePage = (event: unknown, newPage: number) => {
-        setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
-    const paginatedData = tableData.slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-    );
-
+    useEffect(() => {
+        paginated(page, rowsPerPage);
+    }, [page, rowsPerPage, paginated]);
 
     return (
         <div style={{ padding: 20 }}>
@@ -69,8 +62,6 @@ function EmployeeTable({ data, onSuccess, api } : Props) {
                 const updatedData = [...data];
                 const [movedRow] = updatedData.splice(currentIndex, 1);
                 updatedData.splice(newIndex, 0, movedRow);
-
-                setData(updatedData);
                 }}
             >
                 <Droppable droppableId="table-body">
@@ -90,7 +81,7 @@ function EmployeeTable({ data, onSuccess, api } : Props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedData.map((row, index) => {
+                        {data.map((row, index) => {
                         const globalIndex = page * rowsPerPage + index;
                         return (
                             <Draggable
@@ -107,6 +98,7 @@ function EmployeeTable({ data, onSuccess, api } : Props) {
                                     ...provided.draggableProps.style,
                                     backgroundColor: snapshot.isDragging ? '#f4f4f4' : 'white',
                                 }}
+                                onClick={(event) => handleClick(event, row)}
                                 >
                                 <TableCell>
                                     <IconButton {...provided.dragHandleProps}>
@@ -123,7 +115,8 @@ function EmployeeTable({ data, onSuccess, api } : Props) {
                                     <Button
                                     variant="contained"
                                     color="secondary"
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         handleRemove(row.id);
                                     }}
                                     >
@@ -145,11 +138,14 @@ function EmployeeTable({ data, onSuccess, api } : Props) {
             <TablePagination
                 rowsPerPageOptions={[5, 10, 20]}
                 component="div"
-                count={tableData.length}
+                count={meta.totalItems}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                    setRowsPerPage(parseInt(event.target.value, 10));
+                    setPage(0);
+                }}
             />
             </TableContainer>
         </div>
