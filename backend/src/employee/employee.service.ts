@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEmployeeInput, UpdateEmployeeInput} from './types/employee.input';
+import { PaginationInput } from './types/pagination.input';
 
 @Injectable()
 export class EmployeeService {
@@ -12,6 +13,29 @@ export class EmployeeService {
 
   async employeeFindAll() {
     return this.prisma.employee.findMany();
+  }
+
+  async employeeFindAllWithPagination(pagination: PaginationInput) {
+    const { page, pageSize } = pagination;
+    const skip = (page - 1) * pageSize;
+
+    const [items, totalItems] = await Promise.all([
+      this.prisma.employee.findMany({
+        skip,
+        take: pageSize,
+      }),
+      this.prisma.employee.count(),
+    ]);
+
+    return {
+      items,
+      meta: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / pageSize),
+        page,
+        pageSize,
+      },
+    };
   }
 
   async employeeFindOne(id: number) {

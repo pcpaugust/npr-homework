@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { EmployeeService } from './employee.service';
-import { CreateEmployeeInput, UpdateEmployeeInput} from './types/employee.input';
-
+import { CreateEmployeeInput, UpdateEmployeeInput } from './types/employee.input';
+import { PaginationInput } from './types/pagination.input';
 @Resolver('Employee')
 export class EmployeeResolver {
   constructor(private readonly employeeService: EmployeeService) {}
@@ -15,6 +15,14 @@ export class EmployeeResolver {
   employees() {
     return this.employeeService.employeeFindAll();
   }
+
+  @Query('EmployeeFindAllWithPagination')
+  employeesWithPagination(
+    @Args('pagination', { type: () => PaginationInput, nullable: true }) pagination: PaginationInput,
+  ) {
+    return this.employeeService.employeeFindAllWithPagination(pagination);
+  }
+
 
   @Query('EmployeeFindOne')
   employee(@Args('id', { type: () => Int }) id: number) {

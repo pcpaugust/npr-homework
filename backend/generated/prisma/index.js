@@ -136,7 +136,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Pacharapat\\Desktop\\npr\\homework\\backend\\generated\\prisma",
+      "value": "C:\\Users\\Pacharapat\\Desktop\\npr\\npr-homework\\backend\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -150,7 +150,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Pacharapat\\Desktop\\npr\\homework\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\Pacharapat\\Desktop\\npr\\npr-homework\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

@@ -1,3 +1,9 @@
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 type Employee {
   id: Int!
   first_name: String!
@@ -7,11 +13,23 @@ type Employee {
   description: String
 }
 
-enum Gender {
-  MALE
-  FEMALE
-  OTHER
+input PaginationInput {
+  page: Int! = 1
+  pageSize: Int! = 5
 }
+
+type PaginationMetadata {
+  totalItems: Int!
+  totalPages: Int!
+  page: Int!
+  pageSize: Int!
+}
+
+type PaginatedEmployee {
+  items: [Employee!]!
+  meta: PaginationMetadata!
+}
+
 
 input CreateEmployeeInput {
   first_name: String!
@@ -31,6 +49,7 @@ input UpdateEmployeeInput {
 
 type Query {
   EmployeeFindAll: [Employee!]!
+  EmployeeFindAllWithPagination(pagination: PaginationInput!): PaginatedEmployee!
   EmployeeFindOne(id: Int!): Employee
 }
 
