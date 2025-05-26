@@ -58,7 +58,7 @@ export default function Form({ onSuccess, api ,mode = 'create', initialValues}: 
     if (mode === 'update' && initialValues) {
       reset({
         ...initialValues,
-        gender: initialValues?.gender ?? 'none',
+        gender: initialValues?.gender ?? '',
         description: initialValues?.description ?? "",
       });
     }
@@ -66,7 +66,7 @@ export default function Form({ onSuccess, api ,mode = 'create', initialValues}: 
       reset({
         first_name: '',
         last_name: '',
-        gender: 'none',
+        gender: '',
         salary: 0,
         description: '',
       });
